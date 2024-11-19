@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import bookService from './services/phonebook';
 
 
@@ -41,7 +40,6 @@ const Person = ({person, delFunc}) => {
   return (
     <>
       <p>{person.name} {person.number} <button onClick={delFunc}>delete</button></p>
-      
     </>
   )
 }
@@ -54,20 +52,52 @@ const Persons = ({personArry, delFunc}) => {
   )
 }
 
+const Notification = ({ message, messageColor }) => {
+  if (message === null) {
+    return null
+  }
+
+  // adjustable message color
+  const notStyle = {
+    color: messageColor,
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+
+  return (
+    <div style={notStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState(null)
+  const [messageColor, setMessageColor] = useState('red')
 
   const hook = () => {
-    console.log('effect')
     bookService
       .getAll()
       .then(entries => setPersons(entries))
   }
 
   useEffect(hook, [])
+
+  const showMessage = (message, color) => {
+    setMessageColor(color)
+    setMessage(message)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -82,15 +112,20 @@ const App = () => {
           .edit(waldo.id, editData)
           .then(resp => {
             setPersons(persons.map(p => p.id === waldo.id ? resp.data : p))
+            showMessage(`Edited ${waldo.name}'s number`, 'green')
           })
-
+          .catch(error => {
+            showMessage(`Information about ${waldo.name} had already been removed from server`, 'red')
+            setPersons(persons.filter(p => p.id !== waldo.id))
+          })
       }
     } else { //add to book
       bookService
         .create(personObject)
         .then(returnedEntry => {
           setPersons(persons.concat(returnedEntry))
-        
+          
+          showMessage(`Added ${personObject.name}`, 'green')
         })
     }
     setNewName('')
@@ -119,6 +154,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} messageColor={messageColor}/>
       <Filter val={newFilter} changeFunc={e => setNewFilter(e.target.value)}/>
       <h2>Add a new</h2>
       <Form onSub={addPerson} val1={newName} val1ch={e => setNewName(e.target.value)} val2={newNumber} val2ch={e => setNewNumber(e.target.value)} />
