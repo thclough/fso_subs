@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import bookService from './services/phonebook';
 
-function kvIn(arry, item) {
-  let i = 0;
-  do {
-    const curCheck = arry[i]
-
-    if (curCheck.name === item.name) {
-      return true;
-    }
-    i++;
-  } while (i<arry.length)
-  return false;
-}
 
 const Filter = ({val, changeFunc}) => {
   return (
@@ -48,18 +37,19 @@ const Form = ({onSub, val1, val1ch, val2, val2ch}) => {
   </>)
 }
 
-const Person = ({person}) => {
+const Person = ({person, delFunc}) => {
   return (
     <>
-      <p>{person.name} {person.number}</p>
+      <p>{person.name} {person.number} <button onClick={delFunc}>delete</button></p>
+      
     </>
   )
 }
 
-const Persons = ({personArry}) => {
+const Persons = ({personArry, delFunc}) => {
   return (
     <div>
-      {personArry.map(person => <Person key={person.name} person={person} />)}
+      {personArry.map(person => <Person key={person.name} person={person} delFunc={() => delFunc(person)}/>)}
     </div>
   )
 }
@@ -72,12 +62,9 @@ const App = () => {
 
   const hook = () => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-      })
+    bookService
+      .getAll()
+      .then(entries => setPersons(entries))
   }
 
   useEffect(hook, [])
@@ -85,15 +72,40 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const personObject = {name: newName, number: newNumber}
-    const inPhonebook = kvIn(persons, personObject)
-    
-    if (inPhonebook) {
-      alert(`${newName} already added to phonebook`)
-    } else {
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+    const waldo = persons.find(person => person.name === personObject.name)
+
+    if (waldo) { //non unique
+      const auth = window.confirm(`${newName} already added to phonebook, replace the old number with a new one?`)
+      if (auth) {
+        const editData = {number: newNumber}
+        bookService
+          .edit(waldo.id, editData)
+          .then(resp => {
+            setPersons(persons.map(p => p.id === waldo.id ? resp.data : p))
+          })
+
+      }
+    } else { //add to book
+      bookService
+        .create(personObject)
+        .then(returnedEntry => {
+          setPersons(persons.concat(returnedEntry))
+        
+        })
     }
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const delBut = person => {
+    const auth = window.confirm(`Delete ${person.name}?`)
+    if (auth) {
+      bookService
+        .del(person.id)
+        .then(() => {
+          setPersons(persons.filter(delperson => delperson.id !== person.id))
+        })
+      }
   }
 
   function filterFun(item) {
@@ -111,7 +123,7 @@ const App = () => {
       <h2>Add a new</h2>
       <Form onSub={addPerson} val1={newName} val1ch={e => setNewName(e.target.value)} val2={newNumber} val2ch={e => setNewNumber(e.target.value)} />
       <h2>Numbers</h2>
-      <Persons personArry={filteredPersons} />
+      <Persons personArry={filteredPersons} delFunc={delBut}/>
     </div>
   )
 }
