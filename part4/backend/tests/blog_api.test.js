@@ -286,21 +286,23 @@ describe('when there are some blogs saved initially', () => {
     assert.strictEqual(blogsAtEnd.length, helper.listWithTwoBlogs.length - 1)
   })
 
-  test('a blog can be edited', async () => {
+  test('a blog can be edited with a valid token', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToEdit = blogsAtStart[0]
+
+    const token = await helper.firstUserToken()
 
     const newBlog = { likes: 10 }
 
     const updated = await api
           .put(`/api/blogs/${blogToEdit.id}`)
+          .set('Content-Type', 'application/json')
+          .set('Authorization', `Bearer ${token}`)
           .send(newBlog)
 
     assert.deepStrictEqual(updated.body.likes, 10)
   })
 })
-
-
 
 after(async () => {
   await mongoose.connection.close()

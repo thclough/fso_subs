@@ -47,14 +47,24 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
   }
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
 
-  updatedBlog = await Blog.findByIdAndUpdate(
-                        request.params.id,
-                        request.body,
-                        { new: true, runValidators: true, context: 'query' })
+  const user = request.user
 
-  response.json(updatedBlog)
+  // fetch the target blog
+  const targetBlog = await Blog.findById(request.params.id)
+
+  if (user.id.toString() === targetBlog.user.toString()) {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+                          request.params.id,
+                          request.body,
+                          { new: true, runValidators: true, context: 'query' })
+                          response.json(updatedBlog)
+  } else {
+    response.status(401).json({ error: 'you are not the creator of this blog' })
+  }
+
+  
 })
 
 module.exports = blogsRouter
