@@ -1,9 +1,7 @@
-console.log("4a")
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 const helper = require('./test_helper')
-console.log("4b")
 
 test('dummy returns one', () => {
     const blogs = []

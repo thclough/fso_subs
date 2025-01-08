@@ -1,4 +1,6 @@
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const emptyList = []
 
@@ -85,10 +87,39 @@ const listWithManyBlogs = [
 
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
-  return blogs
+  return blogs.map(blog => blog.toJSON())
 }
-  
+
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map(user => user.toJSON())
+}
+
+const tokenFromUser = userObj => {
+// get the user token to login manually
+  const userForToken = {
+      username: userObj.username,
+      id: userObj.id,
+    }
+    
+  const token = jwt.sign(userForToken, process.env.SECRET)
+
+  return token
+  }
+
+const firstUserToken = async () => {
+  users = await usersInDb()
+  user = users[0]
+
+  return tokenFromUser(user)
+}
 
 module.exports = {
-  emptyList, listWithTwoBlogs, listWithOneBlog, listWithManyBlogs, blogsInDb
+  emptyList, 
+  listWithTwoBlogs, 
+  listWithOneBlog, 
+  listWithManyBlogs, 
+  blogsInDb, 
+  usersInDb, 
+  firstUserToken
 }
