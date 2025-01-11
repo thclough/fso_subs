@@ -1,28 +1,38 @@
+import propTypes from 'prop-types'
+
 const LoginForm = ({ submitAction, usernameVal, usernameFunc, passwordVal, passwordFunc }) => (
-    <div>
+  <div>
     <h2>log in to blog application</h2>
     <form onSubmit={submitAction}>
-        <div>
+      <div>
           username
-            <input
-            type="text"
-            value={usernameVal}
-            name="Username"
-            onChange={({ target }) => usernameFunc(target.value)}
-          />
-        </div>
-        <div>
+        <input
+          type="text"
+          value={usernameVal}
+          name="Username"
+          onChange={({ target }) => usernameFunc(target.value)}
+        />
+      </div>
+      <div>
           password
-            <input
-            type="password"
-            value={passwordVal}
-            name="Password"
-            onChange={({ target }) => passwordFunc(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  )
+        <input
+          type="password"
+          value={passwordVal}
+          name="Password"
+          onChange={({ target }) => passwordFunc(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
+  </div>
+)
 
-  export default LoginForm
+LoginForm.propTypes = {
+  submitAction: propTypes.func.isRequired,
+  usernameFunc: propTypes.func.isRequired,
+  passwordFunc: propTypes.func.isRequired,
+  usernameVal: propTypes.string.isRequired,
+  passwordVal: propTypes.string.isRequired
+}
+
+export default LoginForm
