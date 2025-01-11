@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 const logger = require('./logger')
 

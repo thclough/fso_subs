@@ -1,12 +1,44 @@
-const BlogForm = ({ submitAction, formData, formDataHandler }) => (
-    <form onSubmit={submitAction}>
+import { useState } from 'react'
+
+const BlogForm = ({ createBlog }) => {
+    
+    const [formData, setFormData] = useState({
+        title: '',
+        author: '',
+        url: ''
+      }) 
+
+      const handleFormDataChange = (event) => {
+        const { name, value } = event.target
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }))
+      }
+
+      const addBlog = async(event) => {
+        event.preventDefault()
+
+        const res = await createBlog(formData)
+        
+        if (res) {
+          setFormData({
+            title: '',
+            author: '',
+            url: ''
+          })    
+        } 
+      }
+    
+    return (
+    <form onSubmit={addBlog}>
         <div>
           <label htmlFor="title">title:</label> 
           <input 
             id="title"
             name="title"
             value={formData.title}
-            onChange={formDataHandler}
+            onChange={handleFormDataChange}
           />
         </div>
         <div>
@@ -15,7 +47,7 @@ const BlogForm = ({ submitAction, formData, formDataHandler }) => (
             id="author"
             name="author"
             value={formData.author}
-            onChange={formDataHandler}
+            onChange={handleFormDataChange}
           />
         </div>
         <div>
@@ -24,11 +56,11 @@ const BlogForm = ({ submitAction, formData, formDataHandler }) => (
             id="url"
             name="url"
             value={formData.url}
-            onChange={formDataHandler}
+            onChange={handleFormDataChange}
           />
         </div>
         <button type="submit">save</button>
       </form>
-  )
+  )}
 
  export default BlogForm

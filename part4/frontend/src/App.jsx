@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
-
+import Togglable from './components/Togglable'
+import _ from 'lodash'
 
 const Notification = ({ message, messageColor }) => {
   if (message === null) {
@@ -30,13 +31,18 @@ const Notification = ({ message, messageColor }) => {
   )
 }
 
-const BlogList = ({ blogs }) => (
+const BlogList = ({ blogs, onLikeClick, onDelete, userData}) => {
+  return (
     <div>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onLikeClick={onLikeClick} onDelete={onDelete} userData={userData}/>
       )}
     </div>
   )
+}
+
+
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -47,12 +53,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    url: ''
-  }) 
-
+  
   const showMessage = (message, color) => {
     setMessageColor(color)
     setMessage(message)
@@ -87,59 +88,56 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
     try {
-      const returnedBlog = await blogService.create(formData)
+      const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
       showMessage(`${returnedBlog.title} by ${returnedBlog.author} added`, 'green')
+      return true;
     } catch(error) {
-      console.log(error)
       showMessage(`${error.message}:${error.response.data.error}`, 'red')
+      return false;
     }
-
-  } 
-
-  const handleFormDataChange = (event) => {
-    const { name, value } = event.target
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
   }
 
-  // const blogForm = () => (
-  //   <form onSubmit={addBlog}>
-  //       <div>
-  //         <label htmlFor="title">title:</label> 
-  //         <input 
-  //           id="title"
-  //           name="title"
-  //           value={formData.title}
-  //           onChange={handleFormDataChange}
-  //         />
-  //       </div>
-  //       <div>
-  //         <label htmlFor="author">author:</label> 
-  //         <input 
-  //           id="author"
-  //           name="author"
-  //           value={formData.author}
-  //           onChange={handleFormDataChange}
-  //         />
-  //       </div>
-  //       <div>
-  //         <label htmlFor="url">url:</label> 
-  //         <input 
-  //           id="url"
-  //           name="url"
-  //           value={formData.url}
-  //           onChange={handleFormDataChange}
-  //         />
-  //       </div>
-  //       <button type="submit">save</button>
-  //     </form>
-  // )
+  const blogFormRef = useRef()
+  
+  const blogForm = () => (
+    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+      <BlogForm createBlog={addBlog}/>
+    </Togglable>
+  )
+
+  // decorator functions to access state variable blogs
+  const incrementLike = (id) => {
+    const internalFunc = async () => {
+      // find the blog and increment
+      const blog = blogs.find(b => b.id.toString() === id)
+      const blogNoId = {title: blog.title, 
+                        author: blog.author,
+                        likes: blog.likes,
+                        url: blog.url, 
+                        user: blog.user.id }
+     const res = await blogService.addOneLike(blogNoId, id)
+     // edit blogs
+     setBlogs(prevBlogs => prevBlogs.map(b => b.id === id ? res : b ))
+    }
+    return internalFunc
+  }
+
+  const deleteBlog = (id) => {
+    const internalFunc = async () => {
+     const blog = blogs.find(b => b.id.toString() === id)
+     const auth = window.confirm(`Remove ${blog.title} by ${blog.author || 'anonymous'}`)
+     if (auth) {
+       await blogService.del(id)
+       // edit blogs
+       setBlogs(prevBlogs => prevBlogs.filter(b => b.id !== id))
+     }
+    }
+    return internalFunc
+  }
 
   const blogHook = () => {
     blogService
@@ -148,7 +146,8 @@ const App = () => {
       setBlogs(initialBlogs)
     })
   }
-
+  
+  // accessing local storage so use an effect hook
   const userHook = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
 
@@ -162,17 +161,20 @@ const App = () => {
   useEffect(blogHook, [])
   useEffect(userHook, [])
 
+  const sortedBlogs = _.cloneDeep(blogs).sort((a,b) => b.likes - a.likes)
+  //console.log("hello", sortedBlogs.sort())
 
   return (
     <div>
-      <h2>blogs</h2>
+      <h2>Blogs</h2>
       <Notification message={message} messageColor={messageColor}/>
       {user === null ?
         <LoginForm submitAction={handleLogin} usernameVal={username} usernameFunc={setUsername} passwordVal={password} passwordFunc={setPassword}/> :
         <div>
-          <p>{user.name} logged in</p><button onClick={handleLogout}>logout</button>
-        <BlogForm submitAction={addBlog} formData={formData} formDataHandler={handleFormDataChange} />
-        <BlogList blogs={blogs}/>
+          <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+        <h2>Create Blog</h2>
+        {blogForm()}
+        <BlogList blogs={sortedBlogs} onLikeClick={incrementLike} onDelete={deleteBlog} userData={user}/>
         </div>
         }
     </div>
