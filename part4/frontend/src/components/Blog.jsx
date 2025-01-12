@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 
 const Blog = ({ blog, onLikeClick, onDelete, userData }) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -19,8 +18,7 @@ const Blog = ({ blog, onLikeClick, onDelete, userData }) => {
   const blogDetails = (blog) => {
     if (showDetails) {
       return (
-        <div>
-      author: {blog.author && <>{blog.author}</>}<br/>
+        <div className={'.hideableContent'}>
       url: {blog.url && <>{blog.url}</>}<br/>
       likes: {blog.likes} <button onClick={onLikeClick(blog.id)}>like</button>
         </div>
@@ -32,7 +30,7 @@ const Blog = ({ blog, onLikeClick, onDelete, userData }) => {
 
   return (
     <div style={blogStyle}>
-      <b>title:</b> {blog.title} <button onClick={toggleShowDetails}>{buttonLabel}</button>
+      {blog.title} by {blog.author && <>{blog.author}</>} <button onClick={toggleShowDetails}>{buttonLabel}</button>
       {blogDetails(blog)}
       <br></br>
       {blog.user.username === userData.username ?

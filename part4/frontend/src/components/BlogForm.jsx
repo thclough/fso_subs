@@ -38,6 +38,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           id="title"
           name="title"
+          placeholder="title"
           value={formData.title}
           onChange={handleFormDataChange}
         />
@@ -47,6 +48,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           id="author"
           name="author"
+          placeholder="author"
           value={formData.author}
           onChange={handleFormDataChange}
         />
@@ -56,6 +58,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           id="url"
           name="url"
+          placeholder="url"
           value={formData.url}
           onChange={handleFormDataChange}
         />
