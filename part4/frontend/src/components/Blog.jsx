@@ -29,7 +29,7 @@ const Blog = ({ blog, onLikeClick, onDelete, userData }) => {
   const buttonLabel = (showDetails ? 'hide' : 'show' )+ ' details'
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blog">
       {blog.title} by {blog.author && <>{blog.author}</>} <button onClick={toggleShowDetails}>{buttonLabel}</button>
       {blogDetails(blog)}
       <br></br>

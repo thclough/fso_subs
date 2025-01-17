@@ -25,7 +25,7 @@ const Notification = ({ message, messageColor }) => {
   }
 
   return (
-    <div style={notStyle}>
+    <div style={notStyle} data-testid='notification'>
       {message}
     </div>
   )
@@ -160,7 +160,7 @@ const App = () => {
   useEffect(userHook, [])
 
   const sortedBlogs = _.cloneDeep(blogs).sort((a,b) => b.likes - a.likes)
-  //console.log("hello", sortedBlogs.sort())
+  // console.log("hello", sortedBlogs.sort())
 
   return (
     <div>
