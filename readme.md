@@ -1,1 +1,1 @@
-Submissions for University of Helsinki's Full Stack Open course.
+Submissions for University of Helsinki's Full Stack Open course. Part 5 is an extension of Part 4.
