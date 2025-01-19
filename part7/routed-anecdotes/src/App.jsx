@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   BrowserRouter as Router,
   Routes, Route, Link,
@@ -6,11 +7,17 @@ import {
 
 import { useState } from 'react'
 
-const AnecdoteList = ({ anecdotes }) => (
+const AnecdoteList = ({ anecdotes, onVote }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} ><Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link></li>)}
+      {anecdotes.map(anecdote => 
+      <li key={anecdote.id} >
+        <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        <button onClick={() => onVote(anecdote.id)}>Vote</button>
+        {anecdote.votes} votes
+      </li>)}
+      
     </ul>
   </div>
 )
@@ -140,7 +147,6 @@ const App = () => {
       ...anecdote,
       votes: anecdote.votes + 1
     }
-
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
@@ -159,7 +165,7 @@ const App = () => {
 
     <Routes>
       <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes} />} />
-      <Route path="/" element={<AnecdoteList anecdotes={anecdotes}/>} />
+      <Route path="/" element={<AnecdoteList anecdotes={anecdotes} onVote = {vote}/>} />
       <Route path="/create" element={<CreateNew addNew={addNew}/>}/>
       <Route path="/about" element={<About />}/>
     </Routes>
