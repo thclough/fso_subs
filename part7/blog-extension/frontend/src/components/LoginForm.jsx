@@ -1,4 +1,3 @@
-import propTypes from "prop-types";
 import BlendedContext from "../context";
 import { useContext, useState } from "react";
 import loginService from "../services/login";
@@ -7,10 +6,9 @@ import blogService from "../services/blogs";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [, notificationDispatch, user, userDispatch] =
     useContext(BlendedContext);
-
-  const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();

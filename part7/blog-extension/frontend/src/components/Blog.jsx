@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import blogService from "../services/blogs";
 import BlendedContext from "../context";
 import flashNotification from "../utils/helper";
@@ -75,7 +76,7 @@ const Blog = ({ blog, userData }) => {
         <div className={".hideableContent"}>
           url: {blog.url && <>{blog.url}</>}
           <br />
-          likes: {blog.likes}{" "}
+          likes: {blog.likes}
           <button onClick={() => incrementLike()}>like</button>
         </div>
       );
@@ -86,7 +87,9 @@ const Blog = ({ blog, userData }) => {
 
   return (
     <div style={blogStyle} data-testid="blog">
-      {blog.title} by {blog.author && <>{blog.author}</>}{" "}
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title} by {blog.author && <>{blog.author}</>}
+      </Link>
       <button onClick={toggleShowDetails}>{buttonLabel}</button>
       {blogDetails(blog)}
       <br></br>

@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import blogService from "../services/blogs";
 import flashNotification from "../utils/helper";
 
-const BlogForm = () => {
+const BlogForm = ({ aRef }) => {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -18,6 +18,9 @@ const BlogForm = () => {
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (newBlog) => {
+      if (aRef !== null) {
+        aRef.current.toggleVisibility();
+      }
       const blogs = queryClient.getQueryData(["blogs"]);
       queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
       flashNotification(

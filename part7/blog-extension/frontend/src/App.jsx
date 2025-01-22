@@ -1,18 +1,27 @@
 import { useState, useEffect, useRef, useReducer } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
-import _ from "lodash";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-import BlogList from "./components/BlogList";
+import { Container } from "@mui/material";
+
+import BlendedContext from "./context";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
-import blogService from "./services/blogs";
-import Togglable from "./components/Togglable";
-import BlendedContext from "./context";
+import BlogList from "./components/BlogList";
 import Notification from "./components/Notification";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import flashNotification from "./utils/helper";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import AuthWrapper from "./components/AuthContext";
+import Togglable from "./components/Togglable";
+import UserTable from "./components/UserTable";
+import UserView from "./components/UserView";
+import BlogView from "./components/BlogView";
+
+import flashNotification from "./utils/helper";
+
+import blogService from "./services/blogs";
+import userService from "./services/users";
+
+import _ from "lodash";
 
 const App = () => {
   // INTERNAL STATES
@@ -49,71 +58,127 @@ const App = () => {
 
   // BLOG FORM
 
+  const blogFormRef = useRef();
+
   const blogForm = () => (
-    <>
-      <BlogForm />
-    </>
+    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+      <BlogForm aRef={blogFormRef} />
+    </Togglable>
   );
 
-  // const blogFormRef = useRef();
-
-  // const blogForm = () => (
-  //   <Togglable buttonLabel="new blog">
-  //     <BlogForm />
-  //   </Togglable>
-  // );
-
-  // BLOGS
-
-  const result = useQuery({
+  // Fetching Data
+  const blogResult = useQuery({
     queryKey: ["blogs"],
     queryFn: blogService.getAll,
     retry: 1,
   });
 
-  if (result.isLoading) {
-    return <div>loading data...</div>;
-  } else if (result.isError) {
-    return <div>Sorry, could not load the data</div>;
+  const userResult = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.getAll,
+    retry: 1,
+  });
+
+  if (blogResult.isLoading) {
+    console.log("loading users");
+    return <div>loading blog data...</div>;
+  } else if (blogResult.isError) {
+    return <div>Sorry, could not load the blog data</div>;
   }
 
-  const blogs = result.data;
+  const blogs = blogResult.data;
 
   const sortedBlogs = _.cloneDeep(blogs).sort((a, b) => b.likes - a.likes);
 
-  console.log("Hello");
+  if (userResult.isLoading) {
+    return <div>loading user data...</div>;
+  } else if (userResult.isError) {
+    return <div>Sorry, could not load the user data</div>;
+  }
+
+  const users = userResult.data;
+
+  // pages
+
+  const dashboardPage = () => (
+    <AuthWrapper user={user}>
+      <div>
+        <h2>Create Blog</h2>
+        {blogForm()}
+        <BlogList blogs={sortedBlogs} userData={user} />
+      </div>
+    </AuthWrapper>
+  );
+
+  const navHeader = () => {
+    const padding = {
+      padding: 5,
+    };
+    const margin = {
+      margin: 5,
+    };
+    return (
+      <>
+        <Link style={padding} to="/">
+          Blogs
+        </Link>
+        <Link style={padding} to="/users">
+          Use
+        </Link>
+        {user === null ? null : (
+          <>
+            {user.name} logged in
+            <button style={margin} onClick={handleLogout}>
+              logout
+            </button>
+          </>
+        )}
+      </>
+    );
+  };
+
+  const usersPage = () => {
+    return (
+      <AuthWrapper user={user}>
+        <h2>Users</h2>
+        <UserTable users={users} />
+      </AuthWrapper>
+    );
+  };
+
+  const userView = () => (
+    <AuthWrapper user={user}>
+      <UserView users={users} />
+    </AuthWrapper>
+  );
+
+  const blogView = () => (
+    <AuthWrapper user={user}>
+      <BlogView blogs={blogs} />
+    </AuthWrapper>
+  );
+
   return (
-    <Router>
-      <BlendedContext.Provider
-        value={[notification, notificationDispatch, user, userDispatch]}
-      >
-        <div>
-          <h2>Blog App</h2>
-          <Notification />
-        </div>
+    <Container>
+      <Router>
+        <BlendedContext.Provider
+          value={[notification, notificationDispatch, user, userDispatch]}
+        >
+          <div>
+            {navHeader()}
+            <Notification />
+          </div>
 
-        <Routes>
-          <Route path="/login" element={<LoginForm />} />
-
-          <Route
-            path="/"
-            element={
-              <AuthWrapper user={user}>
-                <div>
-                  <p>
-                    {user && user.name} logged in
-                    <button onClick={handleLogout}>logout</button>
-                  </p>
-                  <h2>Create Blog</h2>
-                  {blogForm()}
-                  <BlogList blogs={sortedBlogs} userData={user} />
-                </div>
-              </AuthWrapper>
-            }
-          />
-        </Routes>
-      </BlendedContext.Provider>
-    </Router>
+          <Routes>
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/" element={dashboardPage()} />
+            <Route path="/users" element={usersPage()} />
+            <Route path="/users/:id" element={userView()} />
+            <Route path="/blogs/:id" element={blogView()} />
+          </Routes>
+        </BlendedContext.Provider>
+      </Router>
+    </Container>
   );
 };
 

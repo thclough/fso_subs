@@ -43,4 +43,24 @@ const del = async (id) => {
   await axios.delete(`${baseUrl}/${id}`, config);
 };
 
-export default { setToken, getAll, create, edit, addOneLike, del };
+const editComments = async (comments, id) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const response = await axios.patch(
+    `${baseUrl}/${id}/comments`,
+    { comments },
+    config,
+  );
+  return response.data;
+};
+
+export default {
+  setToken,
+  getAll,
+  create,
+  edit,
+  addOneLike,
+  del,
+  editComments,
+};
