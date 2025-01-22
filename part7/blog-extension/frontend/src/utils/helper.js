@@ -10,7 +10,7 @@ const flashNotification = (message, color, time_ms, disp) => {
       disp({
         payload: {
           message: null,
-          color: null,
+          severity: null,
         },
       }),
     time_ms,

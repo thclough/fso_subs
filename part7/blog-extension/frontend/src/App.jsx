@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef, useReducer } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 
 import { Container } from "@mui/material";
 
@@ -21,6 +27,8 @@ import flashNotification from "./utils/helper";
 import blogService from "./services/blogs";
 import userService from "./services/users";
 
+import NavBar from "./components/Navigate";
+
 import _ from "lodash";
 
 const App = () => {
@@ -30,7 +38,7 @@ const App = () => {
 
   const [notification, notificationDispatch] = useReducer(notificationReducer, {
     message: null,
-    color: null,
+    severity: null,
   });
 
   const [user, userDispatch] = useReducer(userReducer, null);
@@ -80,7 +88,6 @@ const App = () => {
   });
 
   if (blogResult.isLoading) {
-    console.log("loading users");
     return <div>loading blog data...</div>;
   } else if (blogResult.isError) {
     return <div>Sorry, could not load the blog data</div>;
@@ -123,7 +130,7 @@ const App = () => {
           Blogs
         </Link>
         <Link style={padding} to="/users">
-          Use
+          Users
         </Link>
         {user === null ? null : (
           <>
@@ -165,7 +172,7 @@ const App = () => {
           value={[notification, notificationDispatch, user, userDispatch]}
         >
           <div>
-            {navHeader()}
+            {<NavBar />}
             <Notification />
           </div>
 

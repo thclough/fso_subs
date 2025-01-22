@@ -5,6 +5,9 @@ import blogService from "../services/blogs";
 import BlendedContext from "../context";
 import flashNotification from "../utils/helper";
 
+import IconButton from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 const Blog = ({ blog, userData }) => {
   // put in a like click
   const [showDetails, setShowDetails] = useState(false);
@@ -24,7 +27,7 @@ const Blog = ({ blog, userData }) => {
     onError: (error) => {
       flashNotification(
         `${error.notification}:${error.response.data.error}`,
-        "red",
+        "error",
         5000,
         dispatch,
       );
@@ -92,9 +95,10 @@ const Blog = ({ blog, userData }) => {
       </Link>
       <button onClick={toggleShowDetails}>{buttonLabel}</button>
       {blogDetails(blog)}
-      <br></br>
       {blog.user.username === userData.username ? (
-        <button onClick={() => deleteBlog()}>Delete</button>
+        <IconButton aria-label="delete" onClick={() => deleteBlog()}>
+          <DeleteIcon />
+        </IconButton>
       ) : null}
     </div>
   );

@@ -25,7 +25,7 @@ const BlogForm = ({ aRef }) => {
       queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
       flashNotification(
         `${newBlog.title} by ${newBlog.author} added`,
-        "green",
+        "success",
         5000,
         dispatch,
       );
@@ -38,7 +38,7 @@ const BlogForm = ({ aRef }) => {
     onError: (error) => {
       flashNotification(
         `${error.notification}:${error.response.data.error}`,
-        "red",
+        "error",
         5000,
         dispatch,
       );
