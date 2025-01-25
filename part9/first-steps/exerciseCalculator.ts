@@ -6,6 +6,7 @@ interface exerciseVals {
 const parseArgs = (args: string[]): exerciseVals => {
   if (args.length < 3) throw new Error("Not enough arguments");
 
+  // parse includes the target val in addition to the array
   args.slice(2).forEach((arg) => {
     if (isNaN(Number(arg))) {
       throw new Error("no string values allowed, must all be numbers");
@@ -70,13 +71,17 @@ const calculateExercises = (
   };
 };
 
-try {
-  const { targetAvgHrs, exerciseHrs } = parseArgs(process.argv);
-  console.log(calculateExercises(targetAvgHrs, exerciseHrs));
-} catch (error: unknown) {
-  let errorMessage = "Something bad happened";
-  if (error instanceof Error) {
-    errorMessage += " Error: " + error.message;
+if (require.main === module) {
+  try {
+    const { targetAvgHrs, exerciseHrs } = parseArgs(process.argv);
+    console.log(calculateExercises(targetAvgHrs, exerciseHrs));
+  } catch (error: unknown) {
+    let errorMessage = "Something bad happened";
+    if (error instanceof Error) {
+      errorMessage += " Error: " + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
+
+export default calculateExercises;
