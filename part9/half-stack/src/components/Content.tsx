@@ -1,25 +1,19 @@
-interface course {
-  name: string;
-  exerciseCount: number;
+import { CoursePart } from "../types";
+import Part from "./Part";
+
+interface SectionListing {
+  listing: CoursePart[];
 }
 
-interface sectionContent {
-  courses: course[];
-}
-
-const Content = (props: sectionContent) => {
+const Content = (props: SectionListing) => {
   return (
-    <>
-      <p>
-        {props.courses[0].name} {props.courses[0].exerciseCount}
-      </p>
-      <p>
-        {props.courses[1].name} {props.courses[1].exerciseCount}
-      </p>
-      <p>
-        {props.courses[2].name} {props.courses[2].exerciseCount}
-      </p>
-    </>
+    <div>
+      {props.listing.map((course) => (
+        <div key={course.name} style={{ paddingBottom: "10px" }}>
+          <Part course={course} />
+        </div>
+      ))}
+    </div>
   );
 };
 
