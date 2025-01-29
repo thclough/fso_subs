@@ -6,6 +6,15 @@ const getPatients = (): Patient[] => {
   return patients;
 };
 
+const getPatient = (id: string): Patient => {
+  const patientOfInterest = patients.find((patient) => patient.id === id);
+  if (patientOfInterest) {
+    return patientOfInterest;
+  } else {
+    throw new Error("Patient not found");
+  }
+};
+
 const getRedactedPatients = (): RedactedPatient[] => {
   return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
     id,
@@ -21,6 +30,7 @@ const addPatient = (entry: NewPatient): Patient => {
 
   const newPatient = {
     id,
+    entries: [],
     ...entry,
   };
 
@@ -30,6 +40,7 @@ const addPatient = (entry: NewPatient): Patient => {
 
 export default {
   getPatients,
+  getPatient,
   getRedactedPatients,
   addPatient,
 };

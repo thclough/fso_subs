@@ -10,6 +10,10 @@ router.get("/", (_req, res: Response<RedactedPatient[]>) => {
   res.send(patientService.getRedactedPatients());
 });
 
+router.get("/:id", (req, res: Response<Patient>) => {
+  res.json(patientService.getPatient(req.params.id));
+});
+
 const errorMiddleware = (
   error: unknown,
   _req: Request,
