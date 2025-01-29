@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DiaryEntry } from "../types";
+import { DiaryEntry, NewDiaryEntry } from "../types";
 import { EntrySchema } from "../utils";
 import { z } from "zod";
 
@@ -12,4 +12,9 @@ const getAllEntries = async () => {
   return res.data;
 };
 
-export default { getAllEntries };
+const addEntry = async (entryToAdd: NewDiaryEntry) => {
+  const res = await axios.post<DiaryEntry>(baseUrl, entryToAdd);
+  return res.data;
+};
+
+export default { getAllEntries, addEntry };

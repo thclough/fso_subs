@@ -9,7 +9,11 @@ const Entry = (props: RenderEntry) => (
     <b>{props.entry.date}</b> <br />
     weather: {props.entry.weather} <br />
     visibility: {props.entry.visibility} <br />
-    comment: <i>{props.entry.comment}</i>
+    {props.entry.comment && (
+      <>
+        comment: <i>{props.entry.comment}</i>
+      </>
+    )}
   </div>
 );
 
