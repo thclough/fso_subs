@@ -22,6 +22,8 @@ const EntryBody = ({ entry, icon }: EntryBodyProps) => {
         <div>
           <Typography variant="body1" style={{ marginTop: "10px" }}>
             Diagnoses Received:
+          </Typography>
+          <Typography variant="body1" component="div">
             <ul>
               {entry.diagnosisCodes.map((code) => {
                 const diagnosisSearch = diagnoses.find(

@@ -13,6 +13,9 @@ import PatientListPage from "./components/PatientListPage";
 import patientService from "./services/patients";
 import diagnosesService from "./services/diagnoses";
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 const App = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
@@ -39,27 +42,34 @@ const App = () => {
     <div className="App">
       <Router>
         <BlendedContext.Provider value={diagnoses}>
-          <Container>
-            <Typography variant="h3" style={{ marginBottom: "0.5em" }}>
-              Patientor
-            </Typography>
-            <Button component={Link} to="/" variant="contained" color="primary">
-              Home
-            </Button>
-            <Divider hidden />
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <PatientListPage
-                    patients={patients}
-                    setPatients={setPatients}
-                  />
-                }
-              />
-              <Route path="/patients/:id" element={<PatientView />} />
-            </Routes>
-          </Container>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Container>
+              <Typography variant="h3" style={{ marginBottom: "0.5em" }}>
+                Patientor
+              </Typography>
+              <Button
+                component={Link}
+                to="/"
+                variant="contained"
+                color="primary"
+              >
+                Home
+              </Button>
+              <Divider hidden />
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <PatientListPage
+                      patients={patients}
+                      setPatients={setPatients}
+                    />
+                  }
+                />
+                <Route path="/patients/:id" element={<PatientView />} />
+              </Routes>
+            </Container>
+          </LocalizationProvider>
         </BlendedContext.Provider>
       </Router>
     </div>

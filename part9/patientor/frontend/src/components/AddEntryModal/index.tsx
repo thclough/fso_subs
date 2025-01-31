@@ -6,19 +6,19 @@ import {
   Alert,
 } from "@mui/material";
 
-import AddPatientForm from "./AddPatientForm";
-import { PatientFormValues } from "../../types";
+import AddPatientForm from "./AddEntryForm";
+import { NewEntry } from "../../types";
 
 interface Props {
   modalOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: PatientFormValues) => void;
+  onSubmit: (values: NewEntry) => void;
   error?: string;
 }
 
-const AddPatientModal = ({ modalOpen, onClose, onSubmit, error }: Props) => (
+const AddEntryModal = ({ modalOpen, onClose, onSubmit, error }: Props) => (
   <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
-    <DialogTitle>Add a new patient</DialogTitle>
+    <DialogTitle>Add a new entry</DialogTitle>
     <Divider />
     <DialogContent>
       {error && <Alert severity="error">{error}</Alert>}
@@ -27,4 +27,4 @@ const AddPatientModal = ({ modalOpen, onClose, onSubmit, error }: Props) => (
   </Dialog>
 );
 
-export default AddPatientModal;
+export default AddEntryModal;

@@ -3,12 +3,7 @@ import { Entry } from "../../types";
 import HospitalEntryR from "./HospitalEntryR";
 import HealthCheckEntryR from "./HealthCheckEntryR";
 import OccupationalHealthcareEntryR from "./OccupationalHealtcareEntryR";
-
-const assertNever = (value: never): never => {
-  throw new Error(
-    `Unhandled discriminated union member: ${JSON.stringify(value)}`
-  );
-};
+import { assertNever } from "../../utils";
 
 const EntryPanel: React.FC<{ entry: Entry }> = ({ entry }) => {
   switch (entry.type) {
